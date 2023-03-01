@@ -1,0 +1,1 @@
+pyside-uic "E:\web\pyproject\qtTelegraphUploader\main-window.ui" -x -o "E:\web\pyproject\qtTelegraphUploader\main_window.py"

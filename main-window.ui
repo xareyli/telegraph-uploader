@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>720</width>
+    <height>552</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: #F2E9E4;
+</string>
+  </property>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>0</y>
+     <width>181</width>
+     <height>551</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="font">
+       <font>
+        <family>Red Hat Mono</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">.QPushButton {
+	width: 177px;
+	height: 101px;
+	border-radius: 15px;
+	background-color: #22223B;
+	color: #F2E9E4;
+}
+
+.QPushButton:hover {
+	background-color: rgba(34,34,59, 70%);
+}
+
+</string>
+      </property>
+      <property name="text">
+       <string>Create
+Token</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton_3">
+      <property name="font">
+       <font>
+        <family>Red Hat Mono</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">.QPushButton {
+	background-color: #9A8C98;
+	border-radius: 15px;
+	color: #F2E9E4;
+	height: 101px;
+	width: 177px;
+}
+
+.QPushButton:hover {
+	background-color: rgba(154,140,152, 70%);
+}
+</string>
+      </property>
+      <property name="text">
+       <string>Choose
+Folder</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton">
+      <property name="font">
+       <font>
+        <family>Red Hat Mono</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">.QPushButton {
+	width: 177px;
+	height: 101px;
+	border-radius: 15px;
+	background-color: #C9ADA7;
+	color: #FDF8F5;
+}
+
+.QPushButton:hover {
+	background-color: rgba(201,173,167, 70%);
+}
+
+</string>
+      </property>
+      <property name="text">
+       <string>Upload</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QTextBrowser" name="textBrowser">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>137</y>
+     <width>371</width>
+     <height>351</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Red Hat Mono</family>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QTextBrowser {
+	background: white;
+	border: 1px solid #9A8C98;
+	border-radius: 3px;
+}
+
+QScrollBar:vertical {
+    border: none;
+    background:white;
+    width:6px;    
+    margin: 0px 0px 0px 0px;
+}
+QScrollBar::handle:vertical {
+  border-radius: 50%;
+    background: #22223B;
+    min-height: 0px;
+}
+QScrollBar::add-line:vertical {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+    stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));
+    height: 0px;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+}
+QScrollBar::sub-line:vertical {
+    background: red;
+    height: 0 px;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+}
+</string>
+   </property>
+   <property name="html">
+    <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Red Hat Mono'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;a lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being herea lot of text is being here&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>60</y>
+     <width>81</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Red Hat Mono</family>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Progress</string>
+   </property>
+  </widget>
+  <widget class="QProgressBar" name="progressBar">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>90</y>
+     <width>371</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QProgressBar {
+	background: white;
+	border-style: outset;
+    border: 1px solid #9A8C98;
+	border-radius: 3px;
+}
+
+QProgressBar::chunk
+{
+    background-color: #C2FF74;
+ 	border-right: 1px solid #9A8C98;
+}</string>
+   </property>
+   <property name="value">
+    <number>50</number>
+   </property>
+   <property name="textVisible">
+    <bool>false</bool>
+   </property>
+   <property name="format">
+    <string/>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
