@@ -4,10 +4,12 @@ from main_window.service import MainWindowService
 from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtCore import QThread
+import logging
 
 
 class MainWindow():
     def __init__(self):
+        logging.info('main window init')
         self.Form = QtGui.QWidget()
         self.ui = Ui_Form()
         self.ui.setupUi(self.Form)
@@ -19,6 +21,7 @@ class MainWindow():
         self.service.moveToThread(self.thread)
 
     def show(self):
+        logging.info('main window show')
         self.setHandlers()
         self.Form.show()
 
@@ -31,7 +34,6 @@ class MainWindow():
 
         if x == 20:
             self.ui.pushButton_2.setEnabled(True)
-            print('thread is done')
 
     def handleClickedCreateToken(self):
         self.service.progressChanged.connect(self.handleUploadProgress)

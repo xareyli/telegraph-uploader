@@ -1,3 +1,4 @@
+import config
 from main_window import MainWindow
 from PySide import QtGui
 import sys
