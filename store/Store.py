@@ -2,7 +2,7 @@ class Store:
     data = {}
 
     def dset(self, block, key, value):
-        if not self.data[block]:
+        if not (block in self.data):
             self.data[block] = {}
 
         self.data[block][key] = value

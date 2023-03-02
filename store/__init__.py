@@ -1,4 +1,4 @@
-from Store import Store as _Store
+from store.Store import Store as _Store
 
 store = _Store()
 

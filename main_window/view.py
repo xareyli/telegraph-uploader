@@ -6,6 +6,8 @@ from PySide.QtGui import *
 from PySide.QtCore import QThread
 import logging
 from event_bus import bus_instance, bus_messages
+from tkinter import filedialog
+from store import store
 
 
 class MainWindow():
@@ -28,6 +30,7 @@ class MainWindow():
 
     def setHandlers(self):
         self.ui.pushButton_2.clicked.connect(self.handleLogin)
+        self.ui.pushButton_3.clicked.connect(self.handleChooseFolder)
         self.ui.pushButton.clicked.connect(self.handleClickedUpload)
 
     def handleLogin(self):
@@ -35,6 +38,11 @@ class MainWindow():
         self.ui.pushButton.setEnabled(False)
         self.ui.pushButton_2.setEnabled(False)
         self.ui.pushButton_3.setEnabled(False)
+
+    def handleChooseFolder(self):
+        dir = filedialog.askdirectory()
+        store.dset('API', 'dir', dir)
+        self.ui.textBrowser.setPlainText('[API]: set directory ' + dir + '\n' + self.ui.textBrowser.toPlainText())
 
     def handleUploadProgress(self, x):
         self.ui.progressBar.setValue(x / 20 * 100)
