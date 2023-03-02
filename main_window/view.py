@@ -5,6 +5,7 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtCore import QThread
 import logging
+from event_bus import bus_instance, bus_messages
 
 
 class MainWindow():
@@ -26,7 +27,11 @@ class MainWindow():
         self.Form.show()
 
     def setHandlers(self):
-        self.ui.pushButton_2.clicked.connect(self.handleClickedCreateToken)
+        self.ui.pushButton_2.clicked.connect(self.handleLogin)
+        self.ui.pushButton.clicked.connect(self.handleClickedUpload)
+
+    def handleLogin(self):
+        bus_instance.publish(bus_messages.CreateTokenCommand())
 
     def handleUploadProgress(self, x):
         self.ui.progressBar.setValue(x / 20 * 100)
@@ -35,7 +40,7 @@ class MainWindow():
         if x == 20:
             self.ui.pushButton_2.setEnabled(True)
 
-    def handleClickedCreateToken(self):
+    def handleClickedUpload(self):
         self.service.progressChanged.connect(self.handleUploadProgress)
         self.thread.started.connect(self.service.upload)
         self.thread.start()

@@ -1,5 +1,7 @@
 from main_window.view import MainWindow
 
 __all__  = [
-    'MainWindow'
+    'main_window'
 ]
+
+main_window = MainWindow()

@@ -1,12 +1,13 @@
 import config
-from main_window import MainWindow
 from PySide import QtGui
 import sys
 
-# Create application
+# Create application before importing windows
 app = QtGui.QApplication(sys.argv)
 
-main_window = MainWindow()
+from main_window import main_window
+import auth
+
 main_window.show()
 
 app.exec_()
