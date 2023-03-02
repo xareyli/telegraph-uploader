@@ -32,6 +32,9 @@ class MainWindow():
 
     def handleLogin(self):
         bus_instance.publish(bus_messages.CreateTokenCommand())
+        self.ui.pushButton.setEnabled(False)
+        self.ui.pushButton_2.setEnabled(False)
+        self.ui.pushButton_3.setEnabled(False)
 
     def handleUploadProgress(self, x):
         self.ui.progressBar.setValue(x / 20 * 100)
