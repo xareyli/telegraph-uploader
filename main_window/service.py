@@ -15,7 +15,7 @@ class MainWindowService(QObject):
         telegraph_api = Telegraph()
 
         start = time.time()
-        telegraph_api.upload('3r234saf', store.dget('API', 'dir'))
+        telegraph_api.upload(store.dget('API', 'access_token'), store.dget('API', 'dir'))
         end = time.time()
 
         print('Spent time: ' + str(end - start))

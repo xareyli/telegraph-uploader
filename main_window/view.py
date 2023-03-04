@@ -17,6 +17,8 @@ class MainWindow():
         self.ui = Ui_Form()
         self.ui.setupUi(self.Form)
         QCoreApplication.processEvents()
+        
+        bus_instance.subscribe(bus_messages.TokenCreationDoneEvent(), self.onLoggedIn)
 
         # service
         self.service = MainWindowService()
@@ -35,6 +37,8 @@ class MainWindow():
 
     def handleLogin(self):
         bus_instance.publish(bus_messages.CreateTokenCommand())
+
+        # bad idea, agreed
         self.ui.pushButton.setEnabled(False)
         self.ui.pushButton_2.setEnabled(False)
         self.ui.pushButton_3.setEnabled(False)
@@ -52,6 +56,15 @@ class MainWindow():
                 msgBox.exec()
 
         self.ui.textBrowser.setPlainText('[API]: set directory ' + dir + '\n' + self.ui.textBrowser.toPlainText())
+
+    def onLoggedIn(self, event):
+        access_token = store.dget('API', 'access_token')
+        self.ui.textBrowser.setPlainText('[API]: Token generated: ' + access_token)
+
+        # bad idea, agreed
+        self.ui.pushButton.setEnabled(True)
+        self.ui.pushButton_2.setEnabled(True)
+        self.ui.pushButton_3.setEnabled(True)
 
     def handleUploadProgress(self, x):
         self.ui.progressBar.setValue(x / 20 * 100)

@@ -5,9 +5,9 @@ from utils import scaleImage
 
 class Telegraph:
     def createAccount(self, short_name, author_name):
-        account = requests.post('https://api.telegra.ph/createAccount?short_name={}&author_name={}'.format(short_name, author_name)).text
+        account = requests.post('https://api.telegra.ph/createAccount?short_name={}&author_name={}'.format(short_name, author_name)).json()
 
-        return account
+        return account['result']
 
     def upload(self, access_token, imgDir):
         html_content = ""
