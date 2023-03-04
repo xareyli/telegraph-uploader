@@ -2,6 +2,9 @@ import time
 from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtCore import QObject, Signal
+from API import Telegraph
+import time
+from store import store
 
 
 class MainWindowService(QObject):
@@ -9,9 +12,15 @@ class MainWindowService(QObject):
     finished = Signal()
 
     def upload(self):
-        for x in range(1, 21):
-            time.sleep(0.2)
-            self.progressChanged.emit(x)
+        telegraph_api = Telegraph()
+
+        start = time.time()
+        telegraph_api.upload('3r234saf', store.dget('API', 'dir'))
+        end = time.time()
+
+        print('Spent time: ' + str(end - start))
+
+        self.progressChanged.emit('x')
         self.finished.emit()
 
     def chooseFolder(self):

@@ -1,5 +1,6 @@
 import requests
 import os
+from utils import scaleImage
 
 
 class Telegraph:
@@ -11,8 +12,10 @@ class Telegraph:
     def upload(self, access_token, imgDir):
         html_content = ""
 
-        with os.scandir(imgDir) as entries:
-            for entry in entries:
-                fullPath = '{}/{}'.format(imgDir, entry.name)
+        for path,subdir,files in os.walk(imgDir):
+            for name in files:
+                fullpath = os.path.join(path,name)
 
-                # TODO
+                print('Original image size {} Mb'.format(os.stat(fullpath).st_size / (1024 * 1024)))
+                print('Scaled image size {} Mb'.format(os.stat(scaleImage(fullpath)).st_size / (1024 * 1024)))
+                print('------------------------------------------------------')

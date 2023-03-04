@@ -4,9 +4,9 @@ from main_window.service import MainWindowService
 from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtCore import QThread
+from PySide.QtGui import QFileDialog, QMessageBox
 import logging
 from event_bus import bus_instance, bus_messages
-from tkinter import filedialog
 from store import store
 
 
@@ -40,8 +40,17 @@ class MainWindow():
         self.ui.pushButton_3.setEnabled(False)
 
     def handleChooseFolder(self):
-        dir = filedialog.askdirectory()
-        store.dset('API', 'dir', dir)
+        while not store.dget('API', 'dir'):
+            dir = str(QFileDialog.getExistingDirectory(self.Form, "Select Directory"))
+            if dir:
+                store.dset('API', 'dir', dir)
+            else:
+                msgBox = QMessageBox()
+                msgBox.setWindowTitle('Warning')
+                msgBox.setText('You should select a folder')
+                msgBox.setIcon(QMessageBox.Warning)
+                msgBox.exec()
+
         self.ui.textBrowser.setPlainText('[API]: set directory ' + dir + '\n' + self.ui.textBrowser.toPlainText())
 
     def handleUploadProgress(self, x):
