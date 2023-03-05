@@ -57,7 +57,7 @@ class MainWindow():
                 msgBox.setIcon(QMessageBox.Warning)
                 msgBox.exec()
 
-        self.logToUser('APP', 'setting directory' + dir)
+        self.logToUser('APP', 'setting directory ' + dir)
 
     def onLoggedIn(self, event):
         access_token = store.dget('API', 'access_token')
@@ -96,8 +96,8 @@ class MainWindow():
             self.thread.start()
 
     def logToUser(self, where_occured, message):
-        resulting_message = '[{}]: {}\n'.format(where_occured, message)
+        resulting_message = '[{}]: {}'.format(where_occured, message)
 
-        resulting_message = resulting_message + self.ui.textBrowser.toPlainText()
+        resulting_message = resulting_message + '\n-----------------------------------\n' + self.ui.textBrowser.toPlainText()
 
         self.ui.textBrowser.setPlainText(resulting_message)
