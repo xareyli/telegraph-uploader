@@ -4,8 +4,8 @@ from store import store
 import logging
 
 
-def onTokenCreated(event):
+def on_token_created(event):
     logging.info('APP: writing access token to a file')
     save_token_to_file(store.dget('API', 'access_token'))
 
-bus_instance.subscribe(bus_messages.TokenCreationDoneEvent(), onTokenCreated)
+bus_instance.subscribe(bus_messages.TokenCreationDoneEvent(), on_token_created)
