@@ -65,7 +65,7 @@ class MainWindow():
         self.unblockUi()
     
     def onLoginFailed(self, event):
-        self.ui.textBrowser.setPlainText('[API]: Authorization failed, please try again. If the error persists, contact your developer tg: @xareyli')
+        self.ui.textBrowser.setPlainText('[API]: Authorization failed, please try again. If the error persists, contact your developer tg: @xareyli\n' + self.ui.textBrowser.toPlainText())
 
         self.unblockUi()
 
@@ -82,6 +82,11 @@ class MainWindow():
             self.ui.pushButton_2.setEnabled(True)
 
     def handleClickedUpload(self):
-        self.service.progressChanged.connect(self.handleUploadProgress)
-        self.thread.started.connect(self.service.upload)
-        self.thread.start()
+        if not store.dget('API', 'access_token'):
+            self.ui.textBrowser.setPlainText('[APP]: Can\'t upload files because you didn\'t create account \n' + self.ui.textBrowser.toPlainText())
+        elif not store.dget('API', 'dir'):
+            self.ui.textBrowser.setPlainText('[APP]: Can\'t upload files because you didn\'t provide a directory with images \n' + self.ui.textBrowser.toPlainText())
+        else:
+            self.service.progressChanged.connect(self.handleUploadProgress)
+            self.thread.started.connect(self.service.upload)
+            self.thread.start()
