@@ -7,6 +7,7 @@ app = QtGui.QApplication(sys.argv)
 
 from main_window import main_window
 import auth
+import start_hooks
 
 main_window.show()
 
