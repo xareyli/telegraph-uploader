@@ -11,4 +11,6 @@ import start_hooks
 
 main_window.show()
 
+start_hooks.on_app_started()
+
 app.exec_()

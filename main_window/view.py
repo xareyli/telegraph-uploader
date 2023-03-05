@@ -20,6 +20,7 @@ class MainWindow():
 
         bus_instance.subscribe(bus_messages.TokenCreationDoneEvent(), self.onLoggedIn)
         bus_instance.subscribe(bus_messages.TokenCreationFailedEvent(), self.onLoginFailed)
+        bus_instance.subscribe(bus_messages.SetSavedTokenEvent(), self.onSetSavedToken)
 
         # service
         self.service = MainWindowService()
@@ -68,6 +69,9 @@ class MainWindow():
         self.logToUser('API', 'Authorization failed, please try again. If the error persists, contact your developer tg: @xareyli')
 
         self.unblockUi()
+
+    def onSetSavedToken(self, event):
+        self.logToUser('APP', 'Token is loaded from file')
 
     def unblockUi(self):
         self.ui.pushButton.setEnabled(True)

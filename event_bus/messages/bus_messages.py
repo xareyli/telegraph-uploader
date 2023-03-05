@@ -41,3 +41,6 @@ class UploadDoneEvent(_BaseEvent):
 
 class TokenCreationFailedEvent(_BaseEvent):
     type = "token_creation_failed_event"
+
+class SetSavedTokenEvent(_BaseEvent):
+    type = "set_saved_token_event"
