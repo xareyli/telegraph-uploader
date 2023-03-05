@@ -38,3 +38,6 @@ class FolderPickingDoneEvent(_BaseEvent):
 
 class UploadDoneEvent(_BaseEvent):
     type = "upload_done_event"
+
+class TokenCreationFailedEvent(_BaseEvent):
+    type = "token_creation_failed_event"

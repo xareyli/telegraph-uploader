@@ -17,8 +17,9 @@ class MainWindow():
         self.ui = Ui_Form()
         self.ui.setupUi(self.Form)
         QCoreApplication.processEvents()
-        
+
         bus_instance.subscribe(bus_messages.TokenCreationDoneEvent(), self.onLoggedIn)
+        bus_instance.subscribe(bus_messages.TokenCreationFailedEvent(), self.onLoginFailed)
 
         # service
         self.service = MainWindowService()
@@ -61,7 +62,14 @@ class MainWindow():
         access_token = store.dget('API', 'access_token')
         self.ui.textBrowser.setPlainText('[API]: Token generated: ' + access_token)
 
-        # bad idea, agreed
+        self.unblockUi()
+    
+    def onLoginFailed(self, event):
+        self.ui.textBrowser.setPlainText('[API]: Authorization failed, please try again. If the error persists, contact your developer tg: @xareyli')
+
+        self.unblockUi()
+
+    def unblockUi(self):
         self.ui.pushButton.setEnabled(True)
         self.ui.pushButton_2.setEnabled(True)
         self.ui.pushButton_3.setEnabled(True)
