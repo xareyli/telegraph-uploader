@@ -46,7 +46,9 @@ class MainWindow():
         self.ui.pushButton_3.setEnabled(False)
 
     def handleChooseFolder(self):
-        while not store.dget('API', 'dir'):
+        dir = None
+
+        while not dir:
             dir = str(QFileDialog.getExistingDirectory(self.Form, "Select Directory"))
             if dir:
                 store.dset('API', 'dir', dir)
@@ -57,14 +59,23 @@ class MainWindow():
                 msgBox.setIcon(QMessageBox.Warning)
                 msgBox.exec()
 
-        self.logToUser('APP', 'setting directory ' + dir)
+        dir_splitted = dir.split('\\')
+        dir_formated = ''
+
+        for i in range(len(dir_splitted)):
+            if i % 2 != 0:
+                dir_formated = dir_formated + dir_splitted[i] + '\\\n'
+            else:
+                dir_formated = dir_formated + dir_splitted[i] + '\\'
+
+        self.logToUser('APP', 'setting directory: \n' + dir_formated)
 
     def onLoggedIn(self, event):
         access_token = store.dget('API', 'access_token')
-        self.logToUser('API', 'Token generated: ' + access_token)
+        self.logToUser('API', 'Token generated: \n' + access_token)
 
         self.unblockUi()
-    
+
     def onLoginFailed(self, event):
         self.logToUser('API', 'Authorization failed, please try again. If the error persists, contact your developer tg: @xareyli')
 
