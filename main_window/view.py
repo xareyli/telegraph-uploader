@@ -56,16 +56,16 @@ class MainWindow():
                 msgBox.setIcon(QMessageBox.Warning)
                 msgBox.exec()
 
-        self.ui.textBrowser.setPlainText('[API]: set directory ' + dir + '\n' + self.ui.textBrowser.toPlainText())
+        self.logToUser('APP', 'setting directory' + dir)
 
     def onLoggedIn(self, event):
         access_token = store.dget('API', 'access_token')
-        self.ui.textBrowser.setPlainText('[API]: Token generated: ' + access_token)
+        self.logToUser('API', 'Token generated: ' + access_token)
 
         self.unblockUi()
     
     def onLoginFailed(self, event):
-        self.ui.textBrowser.setPlainText('[API]: Authorization failed, please try again. If the error persists, contact your developer tg: @xareyli\n' + self.ui.textBrowser.toPlainText())
+        self.logToUser('API', 'Authorization failed, please try again. If the error persists, contact your developer tg: @xareyli')
 
         self.unblockUi()
 
@@ -83,10 +83,17 @@ class MainWindow():
 
     def handleClickedUpload(self):
         if not store.dget('API', 'access_token'):
-            self.ui.textBrowser.setPlainText('[APP]: Can\'t upload files because you didn\'t create account \n' + self.ui.textBrowser.toPlainText())
+            self.logToUser('APP', 'Can\'t upload files because you didn\'t create account')
         elif not store.dget('API', 'dir'):
-            self.ui.textBrowser.setPlainText('[APP]: Can\'t upload files because you didn\'t provide a directory with images \n' + self.ui.textBrowser.toPlainText())
+            self.logToUser('APP', 'Can\'t upload files because you didn\'t provide a directory with images')
         else:
             self.service.progressChanged.connect(self.handleUploadProgress)
             self.thread.started.connect(self.service.upload)
             self.thread.start()
+
+    def logToUser(self, where_occured, message):
+        resulting_message = '[{}]: {}\n'.format(where_occured, message)
+
+        resulting_message = resulting_message + self.ui.textBrowser.toPlainText()
+
+        self.ui.textBrowser.setPlainText(resulting_message)
