@@ -14,3 +14,8 @@ def scaleImage(path):
     img.save(resized_image_path)
 
     return resized_image_path
+
+
+def getImageExtension(path):
+    path_split = path.split('.')
+    return path_split.pop()

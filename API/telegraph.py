@@ -1,6 +1,6 @@
 import requests
 import os
-from utils import scaleImage
+from utils import scaleImage, getImageExtension, html_to_nodes
 import logging
 from requests import ReadTimeout, ConnectTimeout, HTTPError, Timeout, ConnectionError
 import json
@@ -33,8 +33,38 @@ class Telegraph:
 
         for path,subdir,files in os.walk(imgDir):
             for name in files:
+                is_resized = False
                 fullpath = os.path.join(path,name)
 
-                print('Original image size {} Mb'.format(os.stat(fullpath).st_size / (1024 * 1024)))
-                print('Scaled image size {} Mb'.format(os.stat(scaleImage(fullpath)).st_size / (1024 * 1024)))
-                print('------------------------------------------------------')
+                # if the image is more than 5 Mb, resize it
+                if os.stat(fullpath).st_size / (1024 * 1024) > 5:
+                    fullpath = scaleImage(fullpath)
+                    is_resized = True
+
+                with open(fullpath, 'rb') as imageF:
+                    image_extension = getImageExtension(fullpath)
+
+                    response = requests.post(
+                        'https://telegra.ph/upload',
+                        files={'file': ('file', imageF, 'image/{}'.format(image_extension))}
+                    )
+
+                    image_uploaded = json.loads(response.text)
+
+                    if not ('error' in image_uploaded):
+                        src = image_uploaded[0]['src']
+
+                        html_content = html_content + "<img src='{}' />".format(src)
+                    else:
+                        logging.warning('[API]: skipped "{}" due to "{}"'.format(fullpath, image_uploaded['error']))
+
+                # remove thumbnail
+                if is_resized:
+                    os.remove(fullpath)
+
+        content_to_be_sent = json.dumps(html_to_nodes(html_content))
+        response = requests.get('https://api.telegra.ph/createPage?access_token={}&title=title&content={}&return_content=false'.format(access_token, content_to_be_sent))
+
+        result = json.loads(response.text)['result']
+
+        return result['url']
