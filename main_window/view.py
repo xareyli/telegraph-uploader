@@ -40,11 +40,6 @@ class MainWindow():
     def handleLogin(self):
         bus_instance.publish(bus_messages.CreateTokenCommand())
 
-        # bad idea, agreed
-        self.ui.pushButton.setEnabled(False)
-        self.ui.pushButton_2.setEnabled(False)
-        self.ui.pushButton_3.setEnabled(False)
-
     def handleChooseFolder(self):
         dir = None
 

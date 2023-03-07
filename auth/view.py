@@ -9,10 +9,20 @@ from event_bus import bus_instance, bus_messages
 from utils import show_message_box
 
 
+class AuthWidget(QtGui.QWidget):
+    def __init__(self, closeHandler):
+        super().__init__()
+
+        self.closeHandler = closeHandler
+
+    def closeEvent(self, event):
+        self.closeHandler()
+
+
 class AuthWindow:
     def __init__(self):
         logging.info('auth window init')
-        self.Form = QtGui.QWidget()
+        self.Form = AuthWidget(self.unsetHandlers)
         self.ui = Ui_Form()
         self.ui.setupUi(self.Form)
         QCoreApplication.processEvents()
@@ -24,6 +34,7 @@ class AuthWindow:
         self.ui.pushButton.clicked.connect(self.handleSubmit)
 
     def unsetHandlers(self):
+        print('unsetting handlers')
         self.ui.pushButton.clicked.disconnect(self.handleSubmit)
 
     def handleSubmit(self):

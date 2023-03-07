@@ -12,7 +12,7 @@ from PySide import QtCore, QtGui
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(402, 290)
+        Form.setFixedSize(402, 290)
         Form.setStyleSheet("background-color: #F2E9E4;")
         self.label = QtGui.QLabel(Form)
         self.label.setGeometry(QtCore.QRect(140, 30, 141, 16))
