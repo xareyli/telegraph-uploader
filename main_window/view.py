@@ -78,6 +78,11 @@ class MainWindow():
     def onSetSavedToken(self, event):
         self.logToUser('APP', 'Token is loaded from file')
 
+    def blockUi(self):
+        self.ui.pushButton.setEnabled(False)
+        self.ui.pushButton_2.setEnabled(False)
+        self.ui.pushButton_3.setEnabled(False)
+
     def unblockUi(self):
         self.ui.pushButton.setEnabled(True)
         self.ui.pushButton_2.setEnabled(True)
@@ -96,6 +101,8 @@ class MainWindow():
         else:
             self.logToUser('API', 'unable to upload ¯\_(ツ)_/¯')
 
+        self.unblockUi()
+
     def handleClickedUpload(self):
         if not store.dget('API', 'access_token'):
             self.logToUser('APP', 'Can\'t upload files because you didn\'t create account')
@@ -111,6 +118,7 @@ class MainWindow():
 
             self.threadpool.start(service)
 
+            self.blockUi()
             self.ui.progressBar.setValue(0)
             self.logToUser('API', 'starting upload')
 
