@@ -34,7 +34,6 @@ class AuthWindow:
         self.ui.pushButton.clicked.connect(self.handleSubmit)
 
     def unsetHandlers(self):
-        print('unsetting handlers')
         self.ui.pushButton.clicked.disconnect(self.handleSubmit)
 
     def handleSubmit(self):
