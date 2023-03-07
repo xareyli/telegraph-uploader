@@ -3,7 +3,7 @@ from main_window.layout import Ui_Form
 from main_window.service import MainWindowService
 from PySide.QtCore import *
 from PySide.QtGui import *
-from PySide.QtCore import QThread
+from PySide.QtCore import QThreadPool
 from PySide.QtGui import QFileDialog, QMessageBox
 import logging
 from event_bus import bus_instance, bus_messages
@@ -24,10 +24,7 @@ class MainWindow():
         bus_instance.subscribe(bus_messages.TokenCreationFailedEvent(), self.onLoginFailed)
         bus_instance.subscribe(bus_messages.SetSavedTokenEvent(), self.onSetSavedToken)
 
-        # service
-        self.service = MainWindowService()
-        self.thread = QThread()
-        self.service.moveToThread(self.thread)
+        self.threadpool = QThreadPool()
 
     def show(self):
         logging.info('main window show')
@@ -107,11 +104,14 @@ class MainWindow():
         else:
             self.filesCount = len([name for name in os.listdir(store.dget('API', 'dir'))])
 
-            self.service.progressChanged.connect(self.handleUploadProgress)
-            self.service.finished.connect(self.handleUploadDone)
-            self.thread.started.connect(self.service.upload)
-            self.thread.start()
+            service = MainWindowService()
 
+            service.signals.progressChanged.connect(self.handleUploadProgress)
+            service.signals.finished.connect(self.handleUploadDone)
+
+            self.threadpool.start(service)
+
+            self.ui.progressBar.setValue(0)
             self.logToUser('API', 'starting upload')
 
     def logToUser(self, where_occured, message):
