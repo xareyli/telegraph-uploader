@@ -8,6 +8,8 @@ from PySide.QtGui import QFileDialog, QMessageBox
 import logging
 from event_bus import bus_instance, bus_messages
 from store import store
+import webbrowser
+import os
 
 
 class MainWindow():
@@ -84,12 +86,18 @@ class MainWindow():
         self.ui.pushButton_2.setEnabled(True)
         self.ui.pushButton_3.setEnabled(True)
 
-    def handleUploadProgress(self, x):
-        self.ui.progressBar.setValue(x / 20 * 100)
-        self.ui.textBrowser.setPlainText('[API]: couldn\'t load image_' + str(x) + '.png file, skipped due high size \n' + self.ui.textBrowser.toPlainText())
+    def handleUploadProgress(self, is_successful, number_uploaded, filename):
+        self.ui.progressBar.setValue(number_uploaded / self.filesCount * 100)
 
-        if x == 20:
-            self.ui.pushButton_2.setEnabled(True)
+        if not is_successful:
+            self.logToUser('API', 'couldn\'t load ' + filename + ' file')
+
+    def handleUploadDone(self, article_url, spent_time):
+        if article_url:
+            self.logToUser('API', 'done in {} seconds'.format(str(spent_time)))
+            webbrowser.open(article_url)
+        else:
+            self.logToUser('API', 'unable to upload ¯\_(ツ)_/¯')
 
     def handleClickedUpload(self):
         if not store.dget('API', 'access_token'):
@@ -97,9 +105,14 @@ class MainWindow():
         elif not store.dget('API', 'dir'):
             self.logToUser('APP', 'Can\'t upload files because you didn\'t provide a directory with images')
         else:
+            self.filesCount = len([name for name in os.listdir(store.dget('API', 'dir'))])
+
             self.service.progressChanged.connect(self.handleUploadProgress)
+            self.service.finished.connect(self.handleUploadDone)
             self.thread.started.connect(self.service.upload)
             self.thread.start()
+
+            self.logToUser('API', 'starting upload')
 
     def logToUser(self, where_occured, message):
         resulting_message = '[{}]: {}'.format(where_occured, message)

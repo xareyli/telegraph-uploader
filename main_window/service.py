@@ -8,20 +8,23 @@ from store import store
 
 
 class MainWindowService(QObject):
-    progressChanged = Signal(int)
-    finished = Signal()
+    progressChanged = Signal(bool, int, str)
+    finished = Signal(str, int)
+
+    def fileUploadedCallback(self, is_successful, number_uploaded, filepath):
+        filename = filepath.split('\\')[-1]
+        self.progressChanged.emit(is_successful, number_uploaded, filename)
 
     def upload(self):
         telegraph_api = Telegraph()
 
         start = time.time()
-        telegraph_api.upload(store.dget('API', 'access_token'), store.dget('API', 'dir'))
+        article_url = telegraph_api.upload(store.dget('API', 'access_token'), store.dget('API', 'dir'), self.fileUploadedCallback)
         end = time.time()
 
-        print('Spent time: ' + str(end - start))
+        spent_time = int(end - start)
 
-        self.progressChanged.emit('x')
-        self.finished.emit()
+        self.finished.emit(article_url, spent_time)
 
     def chooseFolder(self):
         for x in range(75):
