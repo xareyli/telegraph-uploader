@@ -2,7 +2,6 @@ import requests
 import os
 from utils import scaleImage, getImageExtension, html_to_nodes
 import logging
-from requests import ReadTimeout, ConnectTimeout, HTTPError, Timeout, ConnectionError
 import json
 
 
@@ -19,12 +18,12 @@ class Telegraph:
                 raise Exception(resp_decoded['error'])
 
             if not str(account.status_code).startswith('2'):
-                raise HTTPError('API: response code differs from 2xx')
+                raise Exception('API: response code differs from 2xx')
 
             logging.info('API: account created successfuly')
 
             return account.json()['result']
-        except (ConnectTimeout, HTTPError, ReadTimeout, Timeout, ConnectionError, Exception) as e:
+        except Exception as e:
             logging.error('[ERROR]: ' + str(e))
             return False
 
@@ -40,10 +39,20 @@ class Telegraph:
 
                 number_uploaded += 1
 
+                original_filepath = fullpath
+                is_size_small_enough = os.stat(fullpath).st_size / (1024 * 1024) < 5
+                scale_ratio = .75
                 # if the image is more than 5 Mb, resize it
-                if os.stat(fullpath).st_size / (1024 * 1024) > 5:
-                    fullpath = scaleImage(fullpath)
+                while not is_size_small_enough:
+                    fullpath = scaleImage(fullpath, scale_ratio)
                     is_resized = True
+
+                    is_size_small_enough = os.stat(fullpath).st_size / (1024 * 1024) < 5
+                    if not is_size_small_enough:
+                        os.remove(fullpath)
+                        scale_ratio -= .05
+                        fullpath = original_filepath
+
 
                 with open(fullpath, 'rb') as imageF:
                     image_extension = getImageExtension(fullpath)

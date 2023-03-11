@@ -1,10 +1,10 @@
 from PIL import Image
 
 
-def scaleImage(path):
+def scaleImage(path, scale_ratio):
     img = Image.open(path)
-    resized_width  = int(img.size[0] * 0.75)
-    resized_height = int(img.size[1] * 0.75)
+    resized_width  = int(img.size[0] * scale_ratio)
+    resized_height = int(img.size[1] * scale_ratio)
     img = img.resize((resized_width, resized_height), Image.ANTIALIAS)
 
     path_split = path.split('.')
