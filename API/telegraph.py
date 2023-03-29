@@ -38,21 +38,11 @@ class Telegraph:
                 fullpath = os.path.join(path,name)
 
                 number_uploaded += 1
-
-                original_filepath = fullpath
                 is_size_small_enough = os.stat(fullpath).st_size / (1024 * 1024) < 5
-                scale_ratio = .75
-                # if the image is more than 5 Mb, resize it
-                while not is_size_small_enough:
-                    fullpath = scaleImage(fullpath, scale_ratio)
+
+                if not is_size_small_enough:
+                    fullpath = self.shrinkImageUntilSizeSmallEnough(fullpath, 5)
                     is_resized = True
-
-                    is_size_small_enough = os.stat(fullpath).st_size / (1024 * 1024) < 5
-                    if not is_size_small_enough:
-                        os.remove(fullpath)
-                        scale_ratio -= .05
-                        fullpath = original_filepath
-
 
                 with open(fullpath, 'rb') as imageF:
                     image_extension = getImageExtension(fullpath)
@@ -93,3 +83,20 @@ class Telegraph:
             return result['result']['url']
         else:
             return False
+
+    def shrinkImageUntilSizeSmallEnough(self, image_path, size_needed):
+        original_filepath = image_path
+        is_size_small_enough = os.stat(image_path).st_size / (1024 * 1024) < size_needed
+        scale_ratio = .75
+        # if the image is more than size_needed Mb, resize it
+        while not is_size_small_enough:
+            image_path = scaleImage(image_path, scale_ratio)
+
+            is_size_small_enough = os.stat(image_path).st_size / (1024 * 1024) < size_needed
+            print(image_path)
+            if not is_size_small_enough:
+                os.remove(image_path)
+                scale_ratio -= .05
+                image_path = original_filepath
+
+        return image_path
