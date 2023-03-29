@@ -1,6 +1,6 @@
 import requests
 import os
-from utils import scaleImage, getImageExtension, html_to_nodes
+from utils import scaleImage, getImageExtension, html_to_nodes, getImageDimensions
 import logging
 import json
 
@@ -36,6 +36,12 @@ class Telegraph:
             for name in files:
                 is_resized = False
                 fullpath = os.path.join(path,name)
+
+                image_dimensions = getImageDimensions(fullpath)
+
+                if (image_dimensions[1] > 5500) or (image_dimensions[0] > 3500):
+                    fullpath = self.fitImageIntoDimensions(fullpath, image_dimensions, (5500, 3500))
+                    is_resized = True
 
                 number_uploaded += 1
                 is_size_small_enough = os.stat(fullpath).st_size / (1024 * 1024) < 5
@@ -93,10 +99,18 @@ class Telegraph:
             image_path = scaleImage(image_path, scale_ratio)
 
             is_size_small_enough = os.stat(image_path).st_size / (1024 * 1024) < size_needed
-            print(image_path)
+
             if not is_size_small_enough:
                 os.remove(image_path)
                 scale_ratio -= .05
                 image_path = original_filepath
 
         return image_path
+
+    def fitImageIntoDimensions(self, image_path, current_dimensions, dimensions_needed):
+        to_fit_height_scale_ratio = (dimensions_needed[1] * 100 / current_dimensions[1]) / 100
+        to_fit_width_scale_ratio = (dimensions_needed[0] * 100 / current_dimensions[0]) / 100
+
+        scale_ratio = min(to_fit_height_scale_ratio, to_fit_width_scale_ratio)
+
+        return scaleImage(image_path, scale_ratio)

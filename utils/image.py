@@ -16,6 +16,12 @@ def scaleImage(path, scale_ratio):
     return resized_image_path
 
 
+def getImageDimensions(path):
+    img = Image.open(path)
+
+    return img.size
+
+
 def getImageExtension(path):
     path_split = path.split('.')
     return path_split.pop()
