@@ -5,6 +5,8 @@ from PySide.QtCore import QObject, Signal, Slot, QRunnable
 from API import Telegraph
 import time
 from store import store
+from utils import compressImagesDir
+import os
 
 
 class _Signals(QObject):
@@ -26,7 +28,14 @@ class MainWindowService(QRunnable):
         telegraph_api = Telegraph()
 
         start = time.time()
-        article_url = telegraph_api.upload(store.dget('API', 'access_token'), store.dget('API', 'dir'), self.fileUploadedCallback)
+        imgDir = store.dget('API', 'dir')
+
+        if not os.path.exists('./temp'):
+            os.makedirs('./temp')
+
+        compressImagesDir(imgDir, './temp/')
+
+        article_url = telegraph_api.upload(store.dget('API', 'access_token'), './temp/', self.fileUploadedCallback)
         end = time.time()
 
         spent_time = int(end - start)
