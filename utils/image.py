@@ -1,6 +1,8 @@
 from PIL import Image
 import os
 import threading
+import shutil
+import logging
 
 
 def scaleImage(path, savePath, scale_ratio):
@@ -53,17 +55,28 @@ def compressImagesDir(imgDir, saveDir):
 
 def compressImagesArray(path, files, saveDir):
     for name in files:
-        fullpath = os.path.join(path, name)
+        if not (name.split('.')[-1] in ('png', 'jpg', 'jpeg')):
+            continue
 
+        fullpath = os.path.join(path, name)
+        is_processed = False
         image_dimensions = getImageDimensions(fullpath)
 
         if (image_dimensions[1] > 5500) or (image_dimensions[0] > 3500):
+            is_processed = True
             fullpath = fitImageIntoDimensions(fullpath, saveDir, image_dimensions, (5500, 3500))
+            logging.info('APP: fitting image into dimensions')
 
         is_size_small_enough = os.stat(fullpath).st_size / (1024 * 1024) < 5
 
         if not is_size_small_enough:
+            is_processed = True
             fullpath = shrinkImageUntilSizeSmallEnough(fullpath, saveDir, 5)
+            logging.info('APP: shrinking image')
+
+        if not is_processed:
+            shutil.copy(fullpath, saveDir)
+            logging.info('APP: copying image without changes')
 
 
 def fitImageIntoDimensions(image_path, save_dir, current_dimensions, dimensions_needed):

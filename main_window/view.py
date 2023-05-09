@@ -7,9 +7,12 @@ from PySide.QtCore import QThreadPool
 from PySide.QtGui import QFileDialog, QMessageBox
 import logging
 from event_bus import bus_instance, bus_messages
+from utils import show_message_box
 from store import store
 import webbrowser
 import os
+from zipfile import ZipFile
+import shutil
 
 
 class MainWindow():
@@ -33,27 +36,24 @@ class MainWindow():
 
     def setHandlers(self):
         self.ui.pushButton_2.clicked.connect(self.handleLogin)
-        self.ui.pushButton_3.clicked.connect(self.handleChooseFolder)
+        self.ui.pushButton_3.clicked.connect(self.handleChooseSource)
         self.ui.pushButton.clicked.connect(self.handleClickedUpload)
 
     def handleLogin(self):
         bus_instance.publish(bus_messages.CreateTokenCommand())
 
-    def handleChooseFolder(self):
-        dir = None
+    def handleChooseSource(self):
+        dir = ''
 
-        while not dir:
-            dir = str(QFileDialog.getExistingDirectory(self.Form, "Select Directory"))
-            if dir:
-                store.dset('API', 'dir', dir)
-            else:
-                msgBox = QMessageBox()
-                msgBox.setWindowTitle('Warning')
-                msgBox.setText('You should select a folder')
-                msgBox.setIcon(QMessageBox.Warning)
-                msgBox.exec()
+        if self.ui.verticalSlider.value() == 1:
+            dir = self.chooseFolder()
+            store.dset('API', 'archive', None)
+        else:
+            dir = self.chooseArchive()
+            store.dset('API', 'dir', None)
 
-        dir_splitted = dir.split('\\')
+        dir = dir.replace('\\', '/')
+        dir_splitted = dir.split('/')
         dir_formated = ''
 
         for i in range(len(dir_splitted)):
@@ -62,7 +62,34 @@ class MainWindow():
             else:
                 dir_formated = dir_formated + dir_splitted[i] + '\\'
 
-        self.logToUser('APP', 'setting directory: \n' + dir_formated)
+        if self.ui.verticalSlider.value() == 1: msg = 'directory'
+        if self.ui.verticalSlider.value() == 2: msg = 'archive'
+
+        self.logToUser('APP', 'setting {}: \n'.format(msg) + dir_formated[:-1])
+
+    def chooseFolder(self):
+        dir = None
+
+        while not dir:
+            dir = str(QFileDialog.getExistingDirectory(self.Form, "Select Directory"))
+            if dir:
+                store.dset('API', 'dir', dir)
+            else:
+                show_message_box('warning', 'You should select a folder')
+
+        return dir
+
+    def chooseArchive(self):
+        archive = ''
+
+        while not (archive.split('.')[-1] in ('zip', 'rar', '7z')):
+            archive = str(QFileDialog.getOpenFileName(self.Form, "Select archive with images", '*', "Archives (*.zip *.rar *.7z)")[0])
+            if (archive.split('.')[-1] in ('zip', 'rar', '7z')):
+                store.dset('API', 'archive', archive)
+            else:
+                show_message_box('warning', 'You should select an archive')
+
+        return archive
 
     def onLoggedIn(self, event):
         access_token = store.dget('API', 'access_token')
@@ -101,15 +128,24 @@ class MainWindow():
         else:
             self.logToUser('API', 'unable to upload ¯\_(ツ)_/¯')
 
+        shutil.rmtree('./temp')
+        shutil.rmtree('./temp_archive')
         self.unblockUi()
 
     def handleClickedUpload(self):
+        upload_source = store.dget('API', 'dir') or store.dget('API', 'archive')
+
         if not store.dget('API', 'access_token'):
             self.logToUser('APP', 'Can\'t upload files because you didn\'t create account')
-        elif not store.dget('API', 'dir'):
+        elif not upload_source:
             self.logToUser('APP', 'Can\'t upload files because you didn\'t provide a directory with images')
         else:
-            self.filesCount = len([name for name in os.listdir(store.dget('API', 'dir'))])
+            if (store.dget('API', 'archive')):
+                with ZipFile(upload_source, 'r') as zObject:
+                    zObject.extractall(path='./temp_archive')
+                    store.dset('API', 'dir', './temp_archive')
+
+            self.filesCount = len([name for name in os.listdir(store.dget('API', 'dir')) if name.split('.')[-1] in ('png', 'jpg', 'jpeg')])
 
             service = MainWindowService()
 

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'E:\web\pyproject\qtTelegraphUploader\main-window.ui'
 #
-# Created: Mon Feb 27 22:05:08 2023
+# Created: Thu May  4 13:15:08 2023
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ class Ui_Form(object):
         Form.setStyleSheet("background-color: #F2E9E4;\n"
 "")
         self.verticalLayoutWidget = QtGui.QWidget(Form)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(50, 0, 181, 551))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(20, 0, 181, 551))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtGui.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -155,16 +155,62 @@ class Ui_Form(object):
         self.progressBar.setTextVisible(False)
         self.progressBar.setFormat("")
         self.progressBar.setObjectName("progressBar")
+        self.verticalSlider = QtGui.QSlider(Form)
+        self.verticalSlider.setGeometry(QtCore.QRect(230, 209, 22, 131))
+        self.verticalSlider.setAutoFillBackground(False)
+        self.verticalSlider.setStyleSheet("QSlider::groove:horizontal {\n"
+"    border: 1px solid;\n"
+"    height: 10px;\n"
+"    margin: 0px;\n"
+"}\n"
+"QSlider::handle:horizontal {\n"
+"    background-color: white;\n"
+"    border: 1px solid;\n"
+"    height: 40px;\n"
+"    width: 40px;\n"
+"    margin: -15px 0px;\n"
+"}")
+        self.verticalSlider.setMinimum(1)
+        self.verticalSlider.setMaximum(2)
+        self.verticalSlider.setSliderPosition(2)
+        self.verticalSlider.setTracking(True)
+        self.verticalSlider.setOrientation(QtCore.Qt.Vertical)
+        self.verticalSlider.setInvertedAppearance(True)
+        self.verticalSlider.setInvertedControls(False)
+        self.verticalSlider.setTickPosition(QtGui.QSlider.NoTicks)
+        self.verticalSlider.setObjectName("verticalSlider")
+        self.label_2 = QtGui.QLabel(Form)
+        self.label_2.setGeometry(QtCore.QRect(215, 180, 51, 20))
+        font = QtGui.QFont()
+        font.setFamily("Red Hat Mono")
+        font.setPointSize(10)
+        self.label_2.setFont(font)
+        self.label_2.setObjectName("label_2")
+        self.label_3 = QtGui.QLabel(Form)
+        self.label_3.setGeometry(QtCore.QRect(212, 350, 61, 20))
+        font = QtGui.QFont()
+        font.setFamily("Red Hat Mono")
+        font.setPointSize(10)
+        self.label_3.setFont(font)
+        self.label_3.setObjectName("label_3")
+
+        def onSliderChanges():
+                if self.verticalSlider.value() == 2:
+                        self.pushButton_3.setText('Choose\nArchive')
+                else:
+                        self.pushButton_3.setText('Choose\nFolder')
+
+        self.verticalSlider.valueChanged.connect(onSliderChanges)
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
-        Form.setWindowTitle('Telegraph uploader')
+        Form.setWindowTitle(QtGui.QApplication.translate("Form", "Form", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_2.setText(QtGui.QApplication.translate("Form", "Create\n"
 "Token", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_3.setText(QtGui.QApplication.translate("Form", "Choose\n"
-"Folder", None, QtGui.QApplication.UnicodeUTF8))
+"Archive", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton.setText(QtGui.QApplication.translate("Form", "Upload", None, QtGui.QApplication.UnicodeUTF8))
         self.textBrowser.setHtml(QtGui.QApplication.translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
@@ -172,3 +218,6 @@ class Ui_Form(object):
 "</style></head><body style=\" font-family:\'Red Hat Mono\'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("Form", "Progress", None, QtGui.QApplication.UnicodeUTF8))
+        self.verticalSlider.setToolTip(QtGui.QApplication.translate("Form", "load mode", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_2.setText(QtGui.QApplication.translate("Form", "Folder", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_3.setText(QtGui.QApplication.translate("Form", "Archive", None, QtGui.QApplication.UnicodeUTF8))
