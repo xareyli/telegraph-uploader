@@ -9,6 +9,7 @@ from utils import compressImagesDir
 import os
 import logging
 from zipfile import ZipFile
+import shutil
 
 
 class _Signals(QObject):
@@ -47,6 +48,9 @@ class MainWindowService(QRunnable):
 
         if len(image_sources):
             article_url = createPage(store.dget('API', 'access_token'), image_sources)
+
+        shutil.rmtree('./temp')
+        shutil.rmtree('./temp_archive')
 
         end = time.time()
 

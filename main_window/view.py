@@ -10,7 +10,6 @@ from event_bus import bus_instance, bus_messages
 from utils import show_message_box
 from store import store
 import webbrowser
-import shutil
 
 
 class MainWindow():
@@ -66,7 +65,7 @@ class MainWindow():
         self.logToUser('APP', 'setting {}: \n'.format(msg) + dir_formated[:-1])
 
     def chooseFolder(self):
-        dir = None
+        dir = ''
 
         while not dir:
             dir = str(QFileDialog.getExistingDirectory(self.Form, "Select Directory"))
@@ -126,8 +125,6 @@ class MainWindow():
         else:
             self.logToUser('API', 'unable to upload ¯\_(ツ)_/¯')
 
-        shutil.rmtree('./temp')
-        shutil.rmtree('./temp_archive')
         self.unblockUi()
 
     def handleClickedUpload(self):
