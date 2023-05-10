@@ -4,10 +4,9 @@ from main_window.service import MainWindowService
 from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtCore import QThreadPool
-from PySide.QtGui import QFileDialog
 import logging
 from event_bus import bus_instance, bus_messages
-from utils import show_message_box
+from utils import choose_archive, choose_folder
 from store import store
 import webbrowser
 
@@ -40,53 +39,39 @@ class MainWindow():
         bus_instance.publish(bus_messages.CreateTokenCommand())
 
     def handleChooseSource(self):
-        dir = ''
+        """The 'select source' button click event listener
 
-        if self.ui.verticalSlider.value() == 1:
-            dir = self.chooseFolder()
-            store.dset('API', 'archive', None)
+        Prompt user to choose a source directory or archive, and store the path in the appropriate configuration variable.
+        Format and display the path to the user in the log.
+
+        """
+        # Determine whether to prompt for a directory or an archive.
+        source_type = 'directory' if self.ui.verticalSlider.value() == 1 else 'archive'
+
+        # Prompt the user for the source path.
+        if source_type == 'directory':
+            source_path = choose_folder()
         else:
-            dir = self.chooseArchive()
+            source_path = choose_archive()
+
+        if source_path == None:
+            return
+
+        # Store the source path in the appropriate configuration variable.
+        if source_type == 'directory':
+            store.dset('API', 'archive', None)
+            store.dset('API', 'dir', source_path)
+        else:
             store.dset('API', 'dir', None)
+            store.dset('API', 'archive', source_path)
 
-        dir = dir.replace('\\', '/')
-        dir_splitted = dir.split('/')
-        dir_formated = ''
+        # Format the source path for display to the user.
+        source_path = source_path.replace('\\', '/')
+        source_parts = source_path.split('/')
+        formatted_path = '/'.join(["{}\n".format(part) if i % 2 != 0 else "{}".format(part) for i, part in enumerate(source_parts)])
 
-        for i in range(len(dir_splitted)):
-            if i % 2 != 0:
-                dir_formated = dir_formated + dir_splitted[i] + '\\\n'
-            else:
-                dir_formated = dir_formated + dir_splitted[i] + '\\'
-
-        if self.ui.verticalSlider.value() == 1: msg = 'directory'
-        if self.ui.verticalSlider.value() == 2: msg = 'archive'
-
-        self.logToUser('APP', 'setting {}: \n'.format(msg) + dir_formated[:-1])
-
-    def chooseFolder(self):
-        dir = ''
-
-        while not dir:
-            dir = str(QFileDialog.getExistingDirectory(self.Form, "Select Directory"))
-            if dir:
-                store.dset('API', 'dir', dir)
-            else:
-                show_message_box('warning', 'You should select a folder')
-
-        return dir
-
-    def chooseArchive(self):
-        archive = ''
-
-        while not (archive.split('.')[-1] in ('zip', 'rar', '7z')):
-            archive = str(QFileDialog.getOpenFileName(self.Form, "Select archive with images", '*', "Archives (*.zip *.rar *.7z)")[0])
-            if (archive.split('.')[-1] in ('zip', 'rar', '7z')):
-                store.dset('API', 'archive', archive)
-            else:
-                show_message_box('warning', 'You should select an archive')
-
-        return archive
+        # Log the chosen source path to the user.
+        self.logToUser('APP', 'setting {}: \n'.format(source_type) + formatted_path)
 
     def onLoggedIn(self, event):
         access_token = store.dget('API', 'access_token')
