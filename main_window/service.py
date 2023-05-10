@@ -36,7 +36,11 @@ class MainWindowService(QRunnable):
 
         image_sources = self.uploadImagesFromDir('./temp/')
 
-        article_url = createPage(store.dget('API', 'access_token'), image_sources)
+        article_url = False
+
+        if len(image_sources):
+            article_url = createPage(store.dget('API', 'access_token'), image_sources)
+
         end = time.time()
 
         spent_time = int(end - start)
