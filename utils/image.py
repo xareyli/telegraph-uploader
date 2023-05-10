@@ -1,6 +1,5 @@
 from PIL import Image
 import os
-import threading
 import shutil
 import logging
 
@@ -13,7 +12,7 @@ def scaleImage(path, savePath, scale_ratio):
 
     path_split = os.path.basename(path).split('.')
     image_extension = path_split.pop()
-    resized_image_path = savePath + '.'.join(path_split) + '.thumbnail.' + image_extension
+    resized_image_path = savePath + '.'.join(path_split) + '.' + image_extension
 
     img.save(resized_image_path)
 
@@ -31,52 +30,30 @@ def getImageExtension(path):
     return path_split.pop()
 
 
-def compressImagesDir(imgDir, saveDir):
-    for path,subdir,files in os.walk(imgDir):
-        l = len(files) // 3
+def compressImage(fullpath, save_dir, dimensions, size):
+    """Fit image into needed stats
 
-        ftFiles = files[:l] # first thread files
-        stFiles = files[l:l * 2] # second thread files
-        ttFiles = files[l * 2:]
+    Accepts an image and transforms it in order to fit given stats
 
-        ft = threading.Thread(target=compressImagesArray, args=(path, ftFiles, saveDir))
-        ft.start()
+    """
+    is_processed = False
+    image_dimensions = getImageDimensions(fullpath)
 
-        st = threading.Thread(target=compressImagesArray, args=(path, stFiles, saveDir))
-        st.start()
+    if (image_dimensions[1] > dimensions[1]) or (image_dimensions[0] > dimensions[0]):
+        is_processed = True
+        fullpath = fitImageIntoDimensions(fullpath, save_dir, image_dimensions, dimensions)
+        logging.info('APP: fitting image into dimensions')
 
-        tt = threading.Thread(target=compressImagesArray, args=(path, ttFiles, saveDir))
-        tt.start()
+    is_size_small_enough = os.stat(fullpath).st_size / (1024 * 1024) < size
 
-        ft.join()
-        st.join()
-        tt.join()
+    if not is_size_small_enough:
+        is_processed = True
+        fullpath = shrinkImageUntilSizeSmallEnough(fullpath, save_dir, size)
+        logging.info('APP: shrinking image')
 
-
-def compressImagesArray(path, files, saveDir):
-    for name in files:
-        if not (name.split('.')[-1] in ('png', 'jpg', 'jpeg')):
-            continue
-
-        fullpath = os.path.join(path, name)
-        is_processed = False
-        image_dimensions = getImageDimensions(fullpath)
-
-        if (image_dimensions[1] > 5500) or (image_dimensions[0] > 3500):
-            is_processed = True
-            fullpath = fitImageIntoDimensions(fullpath, saveDir, image_dimensions, (5500, 3500))
-            logging.info('APP: fitting image into dimensions')
-
-        is_size_small_enough = os.stat(fullpath).st_size / (1024 * 1024) < 5
-
-        if not is_size_small_enough:
-            is_processed = True
-            fullpath = shrinkImageUntilSizeSmallEnough(fullpath, saveDir, 5)
-            logging.info('APP: shrinking image')
-
-        if not is_processed:
-            shutil.copy(fullpath, saveDir)
-            logging.info('APP: copying image without changes')
+    if not is_processed:
+        shutil.copy(fullpath, save_dir)
+        logging.info('APP: copying image without changes')
 
 
 def fitImageIntoDimensions(image_path, save_dir, current_dimensions, dimensions_needed):

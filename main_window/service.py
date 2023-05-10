@@ -5,11 +5,12 @@ from PySide.QtCore import QObject, Signal, Slot, QRunnable
 from libs.telegraph import uploadImage, createPage
 import time
 from store import store
-from utils import compressImagesDir
+from utils import compressImage
 import os
 import logging
 from zipfile import ZipFile
 import shutil
+import threading
 
 
 class _Signals(QObject):
@@ -40,7 +41,7 @@ class MainWindowService(QRunnable):
                 zObject.extractall(path='./temp_archive')
                 img_dir = './temp_archive'
 
-        compressImagesDir(img_dir, './temp/')
+        self.compressImagesDir(img_dir, './temp/')
 
         image_sources = self.uploadImagesFromDir('./temp/')
 
@@ -61,17 +62,9 @@ class MainWindowService(QRunnable):
     def uploadImagesFromDir(self, dir):
         image_sources = []
         number_uploaded = 1
-        total_count = 0
 
         for path, _, files in os.walk(dir):
             for filename in files:
-                if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp')):
-                    total_count += 1
-
-            for filename in files:
-                if not filename.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp')):
-                    continue
-
                 img_src, error = uploadImage(os.path.join(path, filename))
 
                 if not error:
@@ -79,8 +72,37 @@ class MainWindowService(QRunnable):
                 else:
                     logging.warning('[API]: skipped "{}" due to "{}"'.format(filename, error))
 
-                self.fileUploadedCallback(bool(img_src), number_uploaded, total_count, filename)
+                self.fileUploadedCallback(bool(img_src), number_uploaded, len(files), filename)
 
                 number_uploaded += 1
 
         return image_sources
+
+    def compressImagesDir(self, img_dir, save_dir):
+        def compressImagesArray(path, files, save_dir):
+            for filename in files:
+                if filename.lower().split('.')[-1] in ('jpg', 'jpeg', 'png'):
+                    fullpath = os.path.join(path, filename)
+
+                    compressImage(fullpath, save_dir, (5500, 3500), 5)
+
+
+        for path, _, files in os.walk(img_dir):
+            l = len(files) // 3
+
+            ftFiles = files[:l] # first thread files
+            stFiles = files[l:l * 2] # second thread files
+            ttFiles = files[l * 2:] # third thread files
+
+            ft = threading.Thread(target=compressImagesArray, args=(path, ftFiles, save_dir))
+            ft.start()
+
+            st = threading.Thread(target=compressImagesArray, args=(path, stFiles, save_dir))
+            st.start()
+
+            tt = threading.Thread(target=compressImagesArray, args=(path, ttFiles, save_dir))
+            tt.start()
+
+            ft.join()
+            st.join()
+            tt.join()
