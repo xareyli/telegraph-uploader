@@ -1,6 +1,6 @@
 import requests
 import json
-from utils import html_to_nodes
+from libs.html_parser import html_to_nodes
 
 
 def createAccount(self, short_name, author_name):

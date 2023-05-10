@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
-import mimetypes
 import re
-import json
 from html.parser import HTMLParser
 from html.entities import name2codepoint
-from html import escape
 
 
 class NotAllowedTag(Exception):
