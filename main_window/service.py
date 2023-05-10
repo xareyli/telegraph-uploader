@@ -8,10 +8,11 @@ from store import store
 from utils import compressImagesDir
 import os
 import logging
+from zipfile import ZipFile
 
 
 class _Signals(QObject):
-    progressChanged = Signal(bool, int, str)
+    progressChanged = Signal(bool, int, int, str)
     finished = Signal(str, int)
 
 
@@ -20,19 +21,25 @@ class MainWindowService(QRunnable):
         super().__init__()
         self.signals = _Signals()
 
-    def fileUploadedCallback(self, is_successful, number_uploaded, filepath):
+    def fileUploadedCallback(self, is_successful, number_uploaded, total_count, filepath):
         filename = filepath.split('\\')[-1]
-        self.signals.progressChanged.emit(is_successful, number_uploaded, filename)
+        self.signals.progressChanged.emit(is_successful, number_uploaded, total_count, filename)
 
     @Slot()
     def run(self):
         start = time.time()
-        imgDir = store.dget('API', 'dir')
 
         if not os.path.exists('./temp'):
             os.makedirs('./temp')
 
-        compressImagesDir(imgDir, './temp/')
+        img_dir = store.dget('API', 'dir') or store.dget('API', 'archive')
+
+        if os.path.isfile(img_dir):
+            with ZipFile(img_dir, 'r') as zObject:
+                zObject.extractall(path='./temp_archive')
+                img_dir = './temp_archive'
+
+        compressImagesDir(img_dir, './temp/')
 
         image_sources = self.uploadImagesFromDir('./temp/')
 
@@ -50,8 +57,13 @@ class MainWindowService(QRunnable):
     def uploadImagesFromDir(self, dir):
         image_sources = []
         number_uploaded = 1
+        total_count = 0
 
-        for path, dirs, files in os.walk(dir):
+        for path, _, files in os.walk(dir):
+            for filename in files:
+                if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp')):
+                    total_count += 1
+
             for filename in files:
                 if not filename.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp')):
                     continue
@@ -63,7 +75,7 @@ class MainWindowService(QRunnable):
                 else:
                     logging.warning('[API]: skipped "{}" due to "{}"'.format(filename, error))
 
-                self.fileUploadedCallback(bool(img_src), number_uploaded, filename)
+                self.fileUploadedCallback(bool(img_src), number_uploaded, total_count, filename)
 
                 number_uploaded += 1
 

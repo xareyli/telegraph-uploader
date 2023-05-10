@@ -4,14 +4,12 @@ from main_window.service import MainWindowService
 from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtCore import QThreadPool
-from PySide.QtGui import QFileDialog, QMessageBox
+from PySide.QtGui import QFileDialog
 import logging
 from event_bus import bus_instance, bus_messages
 from utils import show_message_box
 from store import store
 import webbrowser
-import os
-from zipfile import ZipFile
 import shutil
 
 
@@ -115,8 +113,8 @@ class MainWindow():
         self.ui.pushButton_2.setEnabled(True)
         self.ui.pushButton_3.setEnabled(True)
 
-    def handleUploadProgress(self, is_successful, number_uploaded, filename):
-        self.ui.progressBar.setValue(number_uploaded / self.filesCount * 100)
+    def handleUploadProgress(self, is_successful, number_uploaded, total_count, filename):
+        self.ui.progressBar.setValue(number_uploaded / total_count * 100)
 
         if not is_successful:
             self.logToUser('API', 'couldn\'t load ' + filename + ' file')
@@ -140,13 +138,6 @@ class MainWindow():
         elif not upload_source:
             self.logToUser('APP', 'Can\'t upload files because you didn\'t provide a directory with images')
         else:
-            if (store.dget('API', 'archive')):
-                with ZipFile(upload_source, 'r') as zObject:
-                    zObject.extractall(path='./temp_archive')
-                    store.dset('API', 'dir', './temp_archive')
-
-            self.filesCount = len([name for name in os.listdir(store.dget('API', 'dir')) if name.split('.')[-1] in ('png', 'jpg', 'jpeg')])
-
             service = MainWindowService()
 
             service.signals.progressChanged.connect(self.handleUploadProgress)
