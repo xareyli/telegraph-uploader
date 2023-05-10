@@ -2,11 +2,12 @@ import time
 from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtCore import QObject, Signal, Slot, QRunnable
-from API import Telegraph
+from libs.telegraph import uploadImage, createPage
 import time
 from store import store
 from utils import compressImagesDir
 import os
+import logging
 
 
 class _Signals(QObject):
@@ -25,8 +26,6 @@ class MainWindowService(QRunnable):
 
     @Slot()
     def run(self):
-        telegraph_api = Telegraph()
-
         start = time.time()
         imgDir = store.dget('API', 'dir')
 
@@ -35,9 +34,33 @@ class MainWindowService(QRunnable):
 
         compressImagesDir(imgDir, './temp/')
 
-        article_url = telegraph_api.upload(store.dget('API', 'access_token'), './temp/', self.fileUploadedCallback)
+        image_sources = self.uploadImagesFromDir('./temp/')
+
+        article_url = createPage(store.dget('API', 'access_token'), image_sources)
         end = time.time()
 
         spent_time = int(end - start)
 
         self.signals.finished.emit(article_url, spent_time)
+
+    def uploadImagesFromDir(self, dir):
+        image_sources = []
+        number_uploaded = 1
+
+        for path, dirs, files in os.walk(dir):
+            for filename in files:
+                if not filename.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp')):
+                    continue
+
+                img_src, error = uploadImage(os.path.join(path, filename))
+
+                if not error:
+                    image_sources.append(img_src)
+                else:
+                    logging.warning('[API]: skipped "{}" due to "{}"'.format(filename, error))
+
+                self.fileUploadedCallback(bool(img_src), number_uploaded, filename)
+
+                number_uploaded += 1
+
+        return image_sources
