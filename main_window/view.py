@@ -35,8 +35,68 @@ class MainWindow():
         self.ui.pushButton_3.clicked.connect(self.handleChooseSource)
         self.ui.pushButton.clicked.connect(self.handleClickedUpload)
 
+    """
+    Bus handlers
+    """
+
+    def onLoggedIn(self, event):
+        access_token = store.dget('API', 'access_token')
+        self.logToUser('API', 'Token generated: \n' + access_token)
+
+        self.unblockUi()
+
+    def onLoginFailed(self, event):
+        self.logToUser('API', 'Authorization failed, please try again. If the error persists, contact your developer tg: @xareyli')
+
+        self.unblockUi()
+
+    def onSetSavedToken(self, event):
+        self.logToUser('APP', 'Token is loaded from file')
+
+    """
+    Signal handlers
+    """
+
+    def handleUploadProgress(self, is_successful, number_uploaded, total_count, filename):
+        self.ui.progressBar.setValue(number_uploaded / total_count * 100)
+
+        if not is_successful:
+            self.logToUser('API', 'couldn\'t load ' + filename + ' file')
+
+    def handleUploadDone(self, article_url, spent_time):
+        if article_url:
+            self.logToUser('API', 'done in {} seconds'.format(str(spent_time)))
+            webbrowser.open(article_url)
+        else:
+            self.logToUser('API', 'unable to upload ¯\_(ツ)_/¯')
+
+        self.unblockUi()
+
+    """
+    Control handlers
+    """
+
     def handleLogin(self):
         bus_instance.publish(bus_messages.CreateTokenCommand())
+
+    def handleClickedUpload(self):
+        upload_source = store.dget('API', 'dir') or store.dget('API', 'archive')
+
+        if not store.dget('API', 'access_token'):
+            self.logToUser('APP', 'Can\'t upload files because you didn\'t create account')
+        elif not upload_source:
+            self.logToUser('APP', 'Can\'t upload files because you didn\'t provide a directory with images')
+        else:
+            service = MainWindowService()
+
+            service.signals.progressChanged.connect(self.handleUploadProgress)
+            service.signals.finished.connect(self.handleUploadDone)
+
+            self.threadpool.start(service)
+
+            self.blockUi()
+            self.ui.progressBar.setValue(0)
+            self.logToUser('API', 'starting upload')
 
     def handleChooseSource(self):
         """The 'select source' button click event listener
@@ -73,65 +133,36 @@ class MainWindow():
         # Log the chosen source path to the user.
         self.logToUser('APP', 'setting {}: \n'.format(source_type) + formatted_path)
 
-    def onLoggedIn(self, event):
-        access_token = store.dget('API', 'access_token')
-        self.logToUser('API', 'Token generated: \n' + access_token)
-
-        self.unblockUi()
-
-    def onLoginFailed(self, event):
-        self.logToUser('API', 'Authorization failed, please try again. If the error persists, contact your developer tg: @xareyli')
-
-        self.unblockUi()
-
-    def onSetSavedToken(self, event):
-        self.logToUser('APP', 'Token is loaded from file')
+    """
+    View methods
+    """
 
     def blockUi(self):
+        """Prevent user interaction
+
+        Blocks all controls (buttons, inputs etc.). Use unblockUi method to cancel.
+
+        """
         self.ui.pushButton.setEnabled(False)
         self.ui.pushButton_2.setEnabled(False)
         self.ui.pushButton_3.setEnabled(False)
 
     def unblockUi(self):
+        """Allows user interaction
+
+        Unblocks all controls (buttons, inputs etc.). Use after blockUi
+
+        """
         self.ui.pushButton.setEnabled(True)
         self.ui.pushButton_2.setEnabled(True)
         self.ui.pushButton_3.setEnabled(True)
-
-    def handleUploadProgress(self, is_successful, number_uploaded, total_count, filename):
-        self.ui.progressBar.setValue(number_uploaded / total_count * 100)
-
-        if not is_successful:
-            self.logToUser('API', 'couldn\'t load ' + filename + ' file')
-
-    def handleUploadDone(self, article_url, spent_time):
-        if article_url:
-            self.logToUser('API', 'done in {} seconds'.format(str(spent_time)))
-            webbrowser.open(article_url)
-        else:
-            self.logToUser('API', 'unable to upload ¯\_(ツ)_/¯')
-
-        self.unblockUi()
-
-    def handleClickedUpload(self):
-        upload_source = store.dget('API', 'dir') or store.dget('API', 'archive')
-
-        if not store.dget('API', 'access_token'):
-            self.logToUser('APP', 'Can\'t upload files because you didn\'t create account')
-        elif not upload_source:
-            self.logToUser('APP', 'Can\'t upload files because you didn\'t provide a directory with images')
-        else:
-            service = MainWindowService()
-
-            service.signals.progressChanged.connect(self.handleUploadProgress)
-            service.signals.finished.connect(self.handleUploadDone)
-
-            self.threadpool.start(service)
-
-            self.blockUi()
-            self.ui.progressBar.setValue(0)
-            self.logToUser('API', 'starting upload')
-
+        
     def logToUser(self, where_occured, message):
+        """Log info that the user can see
+
+        Prints a message to logs box
+
+        """
         resulting_message = '[{}]: {}'.format(where_occured, message)
 
         resulting_message = resulting_message + '\n-----------------------------------\n' + self.ui.textBrowser.toPlainText()
