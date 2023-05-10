@@ -5,7 +5,7 @@ from PySide.QtCore import QObject, Signal, Slot, QRunnable
 from libs.telegraph import uploadImage, createPage
 import time
 from store import store
-from utils import compressImage
+from libs.image import compressImage
 import os
 import logging
 from zipfile import ZipFile

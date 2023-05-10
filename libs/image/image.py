@@ -1,7 +1,6 @@
 from PIL import Image
 import os
 import shutil
-import logging
 
 
 def scaleImage(path, savePath, scale_ratio):
@@ -42,18 +41,15 @@ def compressImage(fullpath, save_dir, dimensions, size):
     if (image_dimensions[1] > dimensions[1]) or (image_dimensions[0] > dimensions[0]):
         is_processed = True
         fullpath = fitImageIntoDimensions(fullpath, save_dir, image_dimensions, dimensions)
-        logging.info('APP: fitting image into dimensions')
 
     is_size_small_enough = os.stat(fullpath).st_size / (1024 * 1024) < size
 
     if not is_size_small_enough:
         is_processed = True
         fullpath = shrinkImageUntilSizeSmallEnough(fullpath, save_dir, size)
-        logging.info('APP: shrinking image')
 
     if not is_processed:
         shutil.copy(fullpath, save_dir)
-        logging.info('APP: copying image without changes')
 
 
 def fitImageIntoDimensions(image_path, save_dir, current_dimensions, dimensions_needed):
