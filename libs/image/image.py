@@ -3,17 +3,48 @@ import os
 import shutil
 
 
-def scaleImage(path, savePath, scale_ratio):
-    img = Image.open(path)
+def scaleImage(path, save_path, scale_ratio):
+    """Scale image by ratio
+
+    Scale an image to a specified ratio and save it to a new location.
+
+    Args:
+        path (str): The path of the original image file.
+        save_path (str): The path where the resized image will be saved.
+        scale_ratio (float): The ratio by which the image will be scaled.
+
+    Returns:
+        str: The path where the resized image has been saved.
+
+    Raises:
+        OSError: If the original image file does not exist.
+    """
+    if not isinstance(path, str):
+        raise ValueError('Image path is not a string')
+    if not isinstance(save_path, str):
+        raise ValueError('Save path is not a string')
+    if not isinstance(scale_ratio, float):
+        raise ValueError('Scale ratio should be a float')
+
+    if not os.path.exists(save_path):
+        raise ValueError('Save path doesn\'t exist')
+
+    try:
+        img = Image.open(path)
+    except OSError:
+        raise FileNotFoundError('Given image is not found')
+
     resized_width  = int(img.size[0] * scale_ratio)
     resized_height = int(img.size[1] * scale_ratio)
     img = img.resize((resized_width, resized_height), Image.ANTIALIAS)
 
     path_split = os.path.basename(path).split('.')
     image_extension = path_split.pop()
-    resized_image_path = savePath + '.'.join(path_split) + '.' + image_extension
+    resized_image_path = save_path + '.'.join(path_split) + '.thumbnail.' + image_extension
 
     img.save(resized_image_path)
+
+    img.close()
 
     return resized_image_path
 
@@ -49,7 +80,11 @@ def compressImage(fullpath, save_dir, dimensions, size):
         fullpath = shrinkImageUntilSizeSmallEnough(fullpath, save_dir, size)
 
     if not is_processed:
-        shutil.copy(fullpath, save_dir)
+        path_split = os.path.basename(fullpath).split('.')
+        image_extension = path_split.pop()
+        image_path = save_dir + '.'.join(path_split) + '.thumbnail.' + image_extension
+
+        shutil.copy(fullpath, image_path)
 
 
 def fitImageIntoDimensions(image_path, save_dir, current_dimensions, dimensions_needed):
