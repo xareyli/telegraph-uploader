@@ -9,7 +9,12 @@ def uploadImage(img_path):
     Can be used for the page creation
 
     """
-    with open(img_path, 'rb') as imageF:
+    try:
+        imageF = open(img_path, 'rb')
+    except OSError as e:
+        raise OSError('Error opening file: {}'.format(str(e)))
+
+    try:
         image_extension = img_path.split('.').pop()
 
         response = requests.post(
@@ -17,12 +22,17 @@ def uploadImage(img_path):
             files={'file': ('file', imageF, 'image/{}'.format(image_extension))}
         )
 
-        if not str(response.status_code).startswith('2'):
-            return False
-        
-        image_uploaded = json.loads(response.text)
+        response.raise_for_status()
 
-        if not ('error' in image_uploaded):
-            return image_uploaded[0]['src'], False
-        else:
-            return False, image_uploaded['error']
+        image_uploaded = json.loads(response.text)
+    except requests.exceptions.RequestException as e:
+        raise requests.exceptions.RequestException('Error uploading image: {}'.format(str(e)))
+    except ValueError as e:
+        raise ValueError('Error decoding server response: {}'.format(str(e)), e.doc, e.pos)
+    except Exception as e:
+        raise Exception('An unexpected error occurred: {}'.format(str(e)))
+
+    if not ('error' in image_uploaded):
+        return image_uploaded[0]['src']
+    else:
+        raise ValueError(image_uploaded['error'])

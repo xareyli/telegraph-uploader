@@ -65,16 +65,16 @@ class MainWindowService(QRunnable):
 
         for path, _, files in os.walk(dir):
             for filename in files:
-                img_src, error = uploadImage(os.path.join(path, filename))
+                try:
+                    img_src = uploadImage(os.path.join(path, filename))
 
-                if not error:
                     image_sources.append(img_src)
-                else:
-                    logging.warning('[API]: skipped "{}" due to "{}"'.format(filename, error))
 
-                self.fileUploadedCallback(bool(img_src), number_uploaded, len(files), filename)
+                    self.fileUploadedCallback(bool(img_src), number_uploaded, len(files), filename)
 
-                number_uploaded += 1
+                    number_uploaded += 1
+                except Exception as e:
+                    logging.warning('[API]: skipped "{}" due to "{}"'.format(filename, str(e)))
 
         return image_sources
 
