@@ -13,6 +13,9 @@ def createPage(access_token, image_sources):
     # create html skeleton of the page
     html_content = ''
 
+    if not isinstance(image_sources, list) or len(image_sources) == 0:
+        raise ValueError('No image sources provided')
+
     for src in image_sources:
         html_content = html_content + "<img src='{}' />".format(src)
 
@@ -24,11 +27,22 @@ def createPage(access_token, image_sources):
         "content": content_to_be_sent
     }
 
-    response = requests.post('https://api.telegra.ph/createPage', data=page_object)
+    try:
+        response = requests.post('https://api.telegra.ph/createPage', data=page_object)
 
-    if str(response.status_code).startswith('2') and not ('error' in response.text):
+        print(response)
+
+        response.raise_for_status()
+
         result = json.loads(response.text)
+    except requests.exceptions.RequestException as e:
+        raise requests.exceptions.RequestException('Error uploading image: {}'.format(str(e)))
+    except ValueError as e:
+        raise ValueError('Error decoding server response: {}'.format(str(e)), e.doc, e.pos)
+    except Exception as e:
+        raise Exception('An unexpected error occurred: {}'.format(str(e)))
 
+    if not ('error' in result):
         return result['result']['url']
     else:
-        return False
+        raise ValueError(result['error'])
