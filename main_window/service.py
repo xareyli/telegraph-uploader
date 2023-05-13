@@ -50,8 +50,11 @@ class MainWindowService(QRunnable):
         if len(image_sources):
             article_url = createPage(store.dget('API', 'access_token'), image_sources)
 
-        shutil.rmtree('./temp')
-        shutil.rmtree('./temp_archive')
+        if os.path.exists('./temp'):
+            shutil.rmtree('./temp')
+
+        if os.path.exists('./temp_archive'):
+            shutil.rmtree('./temp_archive')
 
         end = time.time()
 
